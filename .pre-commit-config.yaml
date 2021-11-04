@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v7.14.0
+    hooks:
+      - id: eslint
+        additional_dependencies:
+          - eslint@7.14.0
+          - eslint-config-airbnb
+          - eslint-config-airbnb-typescript
+          - eslint-config-prettier
+          - jest
+          - prettier
+          - "@typescript-eslint/eslint-plugin"
+        files: \.[t]sx?$ # *.ts and *.tsx
+        types: [file]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.2.0
+    hooks:
+      - id: prettier

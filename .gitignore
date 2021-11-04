@@ -1,3 +1,6 @@
+# Project specific files and folders
+.vscode
+
 # Logs
 logs
 *.log
@@ -21,6 +24,9 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+
+# Unit tests results
+junit.xml
 
 # nyc test coverage
 .nyc_output
