@@ -1,0 +1,69 @@
+@startuml OBudget Data Model
+
+title OBudget data model design
+
+skinparam linetype polyline
+
+class Category {
+  #id
+  +parent_id
+  +name
+  +description
+}
+
+class Payee {
+  #id
+  +name
+}
+
+class AccountType {
+  #id
+  +name -- Checking, Saving, Credit
+  +group_name -- Loan, Investment
+}
+
+class Account {
+  #id
+  +name
+  +type
+  +balance
+}
+
+class Tag {
+  #id
+  +name
+}
+
+class Transaction {
+  #id
+  +data
+  +payee
+  +category
+  +account
+  +date
+  +repeat : boolean
+  +repeat_frequency : int
+  +repeat_type : string
+  +note
+  +cleared : boolean
+  +color
+  +tag
+}
+
+class Budget {
+  #id
+  +month
+  +year
+  +category
+  +amount
+}
+
+'Category::parent_id -right-> Category::id
+Transaction::payee -up-> Payee::id
+Transaction::category -left-> Category::id
+Transaction::account -right-> Account::id
+Transaction::tag -down-> Tag::id
+Account::type -right-> AccountType::id
+Budget::category -right-> Category::id
+
+@enduml
