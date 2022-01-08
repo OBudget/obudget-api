@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
@@ -15,6 +16,13 @@ const getAll: RequestHandler = async (_: Request, res: Response) => {
   ]);
 };
 
+const hashPassword = (password: string, salt: string): string => {
+  return crypto
+    .pbkdf2Sync(password, salt, 100000, 32, "sha512")
+    .toString("hex");
+};
+
 export default {
   getAll,
+  hashPassword,
 };

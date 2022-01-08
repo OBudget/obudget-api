@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import helmet from "helmet";
 
 import V1Router from "routes/v1";
@@ -13,8 +12,8 @@ app.use(cors({ origin: true }));
 app.use(helmet());
 
 // Configuring body parser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 // Set the API version to v1 by default
 app.use("/v1", V1Router);

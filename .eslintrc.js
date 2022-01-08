@@ -36,5 +36,8 @@ module.exports = {
         allow: ["_id"],
       },
     ],
+    // Ignore unused variables/parameters when they start with an underscore
+    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
 };

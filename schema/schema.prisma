@@ -1,0 +1,63 @@
+datasource db {
+  url      = env("DATABASE_URL")
+  provider = "postgres"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  Int        @id @default(autoincrement())
+  name                String?
+  email               String     @unique
+  password            String
+  salt                String
+  accessTokens        OAuthAccessToken[]
+  authorizationCodes  OAuthAuthorizationCode[]
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+}
+
+model OAuthClient {
+  id                   Int         @id @default(autoincrement())
+  clientId             String      @unique
+  clientSecret         String?
+  redirectUris         String[]
+  grants               String[]
+  accessTokenLifetime  Int?
+  refreshTokenLifetime Int?
+  accessTokens         OAuthAccessToken[]
+  authorizationCodes   OAuthAuthorizationCode[]
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model OAuthAuthorizationCode {
+  id                Int         @id @default(autoincrement())
+  authorizationCode String
+  expiresAt         DateTime    @db.Date
+  redirectUri       String
+  scope             String[]
+  client            OAuthClient @relation(fields: [clientId], references: [id])
+  user              User        @relation(fields: [userId], references: [id])
+  clientId          Int
+  userId            Int
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model OAuthAccessToken {
+  id                    Int         @id @default(autoincrement())
+  accessToken           String
+  accessTokenExpiresAt  DateTime?   @db.Date
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?   @db.Date
+  scope                 String[]
+  client                OAuthClient @relation(fields: [clientId], references: [id])
+  clientId              Int
+  user                  User?       @relation(fields: [userId], references: [id])
+  userId                Int
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
