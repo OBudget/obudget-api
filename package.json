@@ -17,10 +17,12 @@
     "lint-junit": "eslint '*/**/*.{js,ts,tsx}' -f junit -o reports/eslint/junit.xml",
     "tsc": "tsc --project tsconfig.production.json",
     "build": "npm-run-all clean tsc",
-    "dev": "nodemon src/index.ts",
-    "prod:start": "NODE_ENV=production NODE_PATH=dist/ node ./dist/index.js",
+    "dev": "cross-env NODE_ENV=development dotenv -e .env.development nodemon src/index.ts",
+    "prod:start": "cross-env NODE_ENV=production NODE_PATH=dist/ dotenv -e .env.production node ./dist/index.js",
     "prod": "npm-run-all build prod:start",
-    "test": "jest --runInBand"
+    "migrate:test": "dotenv -e .env.test -- npx prisma migrate dev --name postgres-init",
+    "test:start": "cross-env NODE_ENV=test dotenv -e .env.test jest --runInBand -- ",
+    "test": "npm-run-all migrate:test \"test:start -- {@}\" -- "
   },
   "dependencies": {
     "@prisma/client": "3.7.0",
@@ -31,7 +33,9 @@
     "@types/swagger-ui-express": "4.1.2",
     "@types/validator": "^13.1.0",
     "cors": "^2.8.5",
+    "cross-env": "7.0.3",
     "dotenv": "^8.2.0",
+    "dotenv-cli": "4.1.1",
     "express": "^4.17.1",
     "express-oauth-server": "2.0.0",
     "helmet": "4.4.1",
@@ -41,7 +45,8 @@
     "swagger-jsdoc": "6.0.6",
     "swagger-ui-express": "4.3.0",
     "typescript": "4.5.4",
-    "validator": "^13.1.17"
+    "validator": "^13.1.17",
+    "winston": "3.3.4"
   },
   "devDependencies": {
     "@types/faker": "^5.1.2",

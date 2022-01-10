@@ -42,6 +42,7 @@ import OAuthServer from "express-oauth-server";
 
 import OAuthModel from "model/OAuth";
 import DocsRouter from "routes/v1/docs";
+import OAuthRouter from "routes/v1/oauth";
 import UserRouter from "routes/v1/users";
 
 // Router for /v1/ api
@@ -52,6 +53,7 @@ const oauth = new OAuthServer({
 
 // Define API routes
 router.use("/docs", DocsRouter);
+router.use("/auth", OAuthRouter);
 router.use("/users", oauth.authenticate(), UserRouter);
 
 export default router;
