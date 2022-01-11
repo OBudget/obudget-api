@@ -42,7 +42,7 @@ import OAuthServer from "express-oauth-server";
 
 import OAuthModel from "model/OAuth";
 import DocsRouter from "routes/v1/docs";
-import OAuthRouter from "routes/v1/oauth";
+import OAuthRouter from "routes/v1/auth";
 import UserRouter from "routes/v1/users";
 
 // Router for /v1/ api

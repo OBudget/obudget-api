@@ -20,15 +20,22 @@ beforeAll(async () => {
 
   logger.info("✨ 1 user successfully created!");
 
-  await prisma.oAuthClient.create({
-    data: {
-      clientId: "client-id",
-      clientSecret: "client-secret",
-      grants: ["password"],
-    },
+  await prisma.oAuthClient.createMany({
+    data: [
+      {
+        clientId: "client-id",
+        clientSecret: "client-secret",
+        grants: ["password"],
+      },
+      {
+        clientId: "client-id-2",
+        clientSecret: "client-secret-2",
+        grants: ["client_credentials"],
+      },
+    ],
   });
 
-  logger.info("✨ 1 OAuth client successfully created!");
+  logger.info("✨ 2 OAuth clients successfully created!");
 });
 
 afterAll(async () => {
@@ -63,6 +70,39 @@ describe("OAuth authentication", () => {
       token_type: "Bearer",
       expires_in: expect.any(Number),
       refresh_token: expect.any(String),
+      scope: expect.any(Array),
+    });
+  });
+
+  it("Should fail authentication if grant type is not allowed", async () => {
+    const res = await request(app).post("/v1/auth/token").type("form").send({
+      grant_type: "password",
+      username: "mail@mail.com",
+      password: "12345",
+      client_id: "client-id-2",
+    });
+
+    expect(res.status).toEqual(StatusCodes.BAD_REQUEST);
+    expect(res.type).toBe("application/json");
+    expect(res.body).toMatchObject({
+      error: "unauthorized_client",
+      error_description: "Unauthorized client: `grant_type` is invalid",
+    });
+  });
+
+  it("Should authenticate a client by client credentials", async () => {
+    const res = await request(app).post("/v1/auth/token").type("form").send({
+      grant_type: "client_credentials",
+      client_id: "client-id-2",
+      client_secret: "client-secret-2",
+    });
+
+    expect(res.status).toEqual(StatusCodes.OK);
+    expect(res.type).toBe("application/json");
+    expect(res.body).toMatchObject({
+      access_token: expect.any(String),
+      token_type: "Bearer",
+      expires_in: expect.any(Number),
       scope: expect.any(Array),
     });
   });

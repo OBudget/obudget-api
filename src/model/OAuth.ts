@@ -217,7 +217,7 @@ export default {
       params.clientSecret = clientSecret;
     }
 
-    const client: OAuthClient | null = await prisma.oAuthClient.findUnique({
+    const client: OAuthClient | null = await prisma.oAuthClient.findFirst({
       where: params,
     });
 
@@ -305,9 +305,10 @@ export default {
           refreshTokenExpiresAt: token.refreshTokenExpiresAt,
           scope: token.scope,
           client: { connect: { clientId: client.id } },
-          user: { connect: { id: user.id } },
+          user: user.id ? { connect: { id: user.id } } : {},
         },
-        include: { user: true, client: true },
+        // eslint-disable-next-line no-unneeded-ternary
+        include: { user: user.id ? true : false, client: true },
       });
 
     if (!accessToken) {
