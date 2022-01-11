@@ -5,6 +5,7 @@ import {
   OAuthAuthorizationCode,
   User as OAuthUser,
 } from "@prisma/client";
+
 import UserController from "controller/User";
 
 const prisma = new PrismaClient();
@@ -88,8 +89,10 @@ const convertDbClient = (client: OAuthClient): Client => {
   };
 
   // Add missing keys from the original object
-  Object.keys(client).forEach((key, value) => {
-    result[key] = value;
+  Object.entries(client).forEach(([key, value]) => {
+    if (!(key in result)) {
+      result[key] = value;
+    }
   });
 
   return result;
@@ -103,8 +106,10 @@ const convertDbAccessToken = (token: OAuthAccessTokenType): Token | Falsey => {
   };
 
   // Add missing keys from the original object
-  Object.keys(token).forEach((key, value) => {
-    result[key] = value;
+  Object.entries(token).forEach(([key, value]) => {
+    if (!(key in result)) {
+      result[key] = value;
+    }
   });
 
   return result;
@@ -124,8 +129,10 @@ const convertDbRefreshToken = (
   };
 
   // Add missing keys from the original object
-  Object.keys(token).forEach((key, value) => {
-    result[key] = value;
+  Object.entries(token).forEach(([key, value]) => {
+    if (!(key in result)) {
+      result[key] = value;
+    }
   });
 
   return result;
@@ -143,10 +150,11 @@ const convertDbAuthCode = (
   };
 
   // Add missing keys from the original object
-  Object.keys(code).forEach((key, value) => {
-    result[key] = value;
+  Object.entries(code).forEach(([key, value]) => {
+    if (!(key in result)) {
+      result[key] = value;
+    }
   });
-
   return result;
 };
 
@@ -209,7 +217,9 @@ export default {
       params.clientSecret = clientSecret;
     }
 
-    const client = await prisma.oAuthClient.findUnique({ where: params });
+    const client: OAuthClient | null = await prisma.oAuthClient.findUnique({
+      where: params,
+    });
 
     if (!client) {
       return false;
@@ -295,7 +305,7 @@ export default {
           refreshTokenExpiresAt: token.refreshTokenExpiresAt,
           scope: token.scope,
           client: { connect: { clientId: client.id } },
-          user: { connect: user.id },
+          user: { connect: { id: user.id } },
         },
         include: { user: true, client: true },
       });

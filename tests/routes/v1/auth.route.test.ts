@@ -38,10 +38,10 @@ afterAll(async () => {
   const deleteOAuthTokens = prisma.oAuthAccessToken.deleteMany();
 
   await prisma.$transaction([
-    deleteUsers,
-    deleteOAuthClients,
-    deleteOAuthCodes,
     deleteOAuthTokens,
+    deleteOAuthCodes,
+    deleteOAuthClients,
+    deleteUsers,
   ]);
 
   await prisma.$disconnect();
@@ -49,7 +49,7 @@ afterAll(async () => {
 
 describe("OAuth authentication", () => {
   it("Should authenticate a user by valid username/password", async () => {
-    const res = await request(app).post("/v1/auth/token").send({
+    const res = await request(app).post("/v1/auth/token").type("form").send({
       grant_type: "password",
       username: "mail@mail.com",
       password: "12345",
@@ -58,7 +58,12 @@ describe("OAuth authentication", () => {
 
     expect(res.status).toEqual(StatusCodes.OK);
     expect(res.type).toBe("application/json");
-    logger.debug(res.body);
-    expect(res.body).toMatchObject({});
+    expect(res.body).toMatchObject({
+      access_token: expect.any(String),
+      token_type: "Bearer",
+      expires_in: expect.any(Number),
+      refresh_token: expect.any(String),
+      scope: expect.any(Array),
+    });
   });
 });

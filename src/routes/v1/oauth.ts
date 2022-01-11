@@ -68,6 +68,15 @@ const oauth = new OAuthServer({
  *          '404':
  *            $ref: '#/components/responses/NotFound'
  */
-router.post("/token", oauth.token());
+router.post(
+  "/token",
+  oauth.token({
+    requireClientAuthentication: {
+      authorization_code: false,
+      refresh_token: false,
+      password: false,
+    },
+  })
+);
 
 export default router;

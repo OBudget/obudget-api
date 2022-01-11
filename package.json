@@ -20,9 +20,10 @@
     "dev": "cross-env NODE_ENV=development dotenv -e .env.development nodemon src/index.ts",
     "prod:start": "cross-env NODE_ENV=production NODE_PATH=dist/ dotenv -e .env.production node ./dist/index.js",
     "prod": "npm-run-all build prod:start",
-    "migrate:test": "dotenv -e .env.test -- npx prisma migrate dev --name postgres-init",
+    "migrate-test:reset": "dotenv -e .env.test -- npx prisma migrate reset -f",
+    "migrate-test:run": "dotenv -e .env.test -- npx prisma migrate dev --name postgres-init",
     "test:start": "cross-env NODE_ENV=test dotenv -e .env.test jest --runInBand -- ",
-    "test": "npm-run-all migrate:test \"test:start -- {@}\" -- "
+    "test": "npm-run-all migrate-test:reset migrate-test:run \"test:start -- {@}\" -- "
   },
   "dependencies": {
     "@prisma/client": "3.7.0",
