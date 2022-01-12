@@ -271,15 +271,21 @@ export default {
     client: Client,
     user: User
   ): Promise<AuthorizationCode | Falsey> => {
+    // Convert scope into array if passed as string
+    let { scope } = code;
+    if (typeof scope === "string") {
+      scope = scope.trim().replace(" ", "").split(",");
+    }
+
     const authCode: OAuthAuthorizationCodeType | null =
       await prisma.oAuthAuthorizationCode.create({
         data: {
           authorizationCode: code.authorizationCode,
-          user: { connect: user.id },
+          user: { connect: { id: user.id } },
           client: { connect: { clientId: client.id } },
           redirectUri: code.redirectUri,
           expiresAt: code.expiresAt,
-          scope: code.scope,
+          scope,
         },
         include: { user: true, client: true },
       });

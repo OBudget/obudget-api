@@ -36,7 +36,7 @@ model OAuthClient {
 model OAuthAuthorizationCode {
   id                Int         @id @default(autoincrement())
   authorizationCode String
-  expiresAt         DateTime    @db.Date
+  expiresAt         DateTime
   redirectUri       String
   scope             String[]
   client            OAuthClient @relation(fields: [clientId], references: [id])
@@ -50,9 +50,9 @@ model OAuthAuthorizationCode {
 model OAuthAccessToken {
   id                    Int         @id @default(autoincrement())
   accessToken           String
-  accessTokenExpiresAt  DateTime?   @db.Date
+  accessTokenExpiresAt  DateTime?
   refreshToken          String?
-  refreshTokenExpiresAt DateTime?   @db.Date
+  refreshTokenExpiresAt DateTime?
   scope                 String[]
   client                OAuthClient @relation(fields: [clientId], references: [id])
   clientId              Int
