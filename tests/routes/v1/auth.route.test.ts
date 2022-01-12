@@ -33,10 +33,26 @@ beforeAll(async () => {
         grants: ["authorization_code", "client_credentials"],
         redirectUris: ["https://localohost:12345/callback"],
       },
+      {
+        clientId: "client-id-3",
+        grants: ["refresh_token"],
+      },
     ],
   });
 
   logger.info("✨ 2 OAuth clients successfully created!");
+
+  await prisma.oAuthAccessToken.create({
+    data: {
+      accessToken: "e63ea45bd4f897c4e4206a413f86d668e639bb5d",
+      refreshToken: "8aa4307dde8737745ba1fa0923feddd0df3fc5df",
+      scope: ["videos"],
+      client: { connect: { clientId: "client-id-3" } },
+      user: { connect: { email: "mail@mail.com" } },
+    },
+  });
+
+  logger.info("✨ 1 OAuth token successfully created!");
 });
 
 afterAll(async () => {
@@ -149,6 +165,25 @@ describe("OAuth authentication", () => {
       token_type: "Bearer",
       expires_in: expect.any(Number),
       scope: expect.any(Array),
+    });
+  });
+
+  it("Should refresh a token successfully", async () => {
+    const res = await request(app).post("/v1/auth/token").type("form").send({
+      grant_type: "refresh_token",
+      refresh_token: "8aa4307dde8737745ba1fa0923feddd0df3fc5df",
+      scope: "videos",
+      client_id: "client-id-3",
+    });
+
+    expect(res.status).toEqual(StatusCodes.OK);
+    expect(res.type).toBe("application/json");
+    expect(res.body).toMatchObject({
+      access_token: expect.any(String),
+      token_type: "Bearer",
+      expires_in: expect.any(Number),
+      refresh_token: expect.any(String),
+      scope: ["videos"],
     });
   });
 });
