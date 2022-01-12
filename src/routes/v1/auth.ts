@@ -63,7 +63,7 @@ const oauth = new OAuthServer({
 /**
  * @openapi
  *  paths:
- *    /:
+ *    /auth:
  *      post:
  *        summary: Request an authorization code
  *        tags: [Authentication]
@@ -98,7 +98,7 @@ router.post(
 /**
  * @openapi
  *  paths:
- *    /token:
+ *    /auth/token:
  *      post:
  *        summary: Request an access token
  *        tags: [Authentication]
