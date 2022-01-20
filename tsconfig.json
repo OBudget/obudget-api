@@ -19,6 +19,6 @@
     "strict": true,
     "target": "es6"
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"],
+  "include": ["src/**/*.ts", "tests/**/*.ts", "prisma/seed.ts"],
   "exclude": ["node_modules", "dist"]
 }

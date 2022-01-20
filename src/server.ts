@@ -12,8 +12,8 @@ app.use(cors({ origin: true }));
 app.use(helmet());
 
 // Configuring body parser middleware
-app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Set the API version to v1 by default
 app.use("/v1", V1Router);

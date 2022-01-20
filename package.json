@@ -10,6 +10,9 @@
   "author": "Sergei Shilin",
   "license": "GPL-3.0",
   "main": "src/index.ts",
+  "prisma": {
+    "seed": "ts-node -r tsconfig-paths/register prisma/seed.ts"
+  },
   "scripts": {
     "clean": "rimraf dist/*",
     "prettier": "prettier --check 'src/**/*.{js,ts,tsx}'",
@@ -17,13 +20,17 @@
     "lint-junit": "eslint '*/**/*.{js,ts,tsx}' -f junit -o reports/eslint/junit.xml",
     "tsc": "tsc --project tsconfig.production.json",
     "build": "npm-run-all clean tsc",
-    "dev": "cross-env NODE_ENV=development dotenv -e .env.development nodemon src/index.ts",
     "prod:start": "cross-env NODE_ENV=production NODE_PATH=dist/ dotenv -e .env.production node ./dist/index.js",
     "prod": "npm-run-all build prod:start",
-    "migrate-test:reset": "dotenv -e .env.test -- npx prisma migrate reset -f",
-    "migrate-test:run": "dotenv -e .env.test -- npx prisma migrate dev --name postgres-init",
+    "dev:erase-db": "dotenv -e .env.development -- npx prisma migrate reset -f --skip-seed",
+    "dev:migrate-db": "dotenv -e .env.development -- npx prisma migrate dev --skip-seed --name postgres-init",
+    "dev:populate-db": "dotenv -e .env.development -- npx prisma db seed",
+    "dev": "cross-env NODE_ENV=development dotenv -e .env.development nodemon src/index.ts",
+    "test:erase-db": "dotenv -e .env.test -- npx prisma migrate reset -f --skip-seed",
+    "test:migrate-db": "dotenv -e .env.test -- npx prisma migrate dev --skip-seed --name postgres-init",
+    "test:populate-db": "dotenv -e .env.test -- npx prisma db seed",
     "test:start": "cross-env NODE_ENV=test dotenv -e .env.test jest --runInBand -- ",
-    "test": "npm-run-all migrate-test:reset migrate-test:run \"test:start -- {@}\" -- "
+    "test": "npm-run-all test:erase-db test:migrate-db test:populate-db \"test:start -- {@}\" -- "
   },
   "dependencies": {
     "@prisma/client": "3.8.0",
@@ -73,6 +80,7 @@
     "nodemon": "^2.0.4",
     "prettier": "2.5.1",
     "prisma": "3.8.0",
+    "prisma-dbml-generator": "0.8.3",
     "supertest": "^5.0.0",
     "ts-jest": "27.0.7",
     "ts-node": "9.1.1",

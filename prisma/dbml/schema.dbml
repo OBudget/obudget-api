@@ -1,0 +1,162 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table User {
+  id Int [pk, increment]
+  name String
+  email String [unique, not null]
+  password String [not null]
+  salt String [not null]
+  accessTokens OAuthAccessToken [not null]
+  authorizationCodes OAuthAuthorizationCode [not null]
+  budgets Budget [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Payee {
+  id Int [pk, increment]
+  name String [not null]
+  transactions Transaction [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Budget {
+  id Int [pk, increment]
+  name String [not null]
+  user User [not null]
+  userId Int [not null]
+  categories Category [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Category {
+  id Int [pk, increment]
+  name String [not null]
+  budget Budget [not null]
+  group CategoryGroup
+  budgetId Int [not null]
+  groupId Int
+  hidden Boolean [not null]
+  transactions Transaction [not null]
+  budgetTaken BudgetAction [not null]
+  budgetAdded BudgetAction [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table CategoryGroup {
+  id Int [pk, increment]
+  name String [not null]
+  categories Category [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table BudgetAction {
+  id Int [pk, increment]
+  date DateTime [not null]
+  amount Float [not null]
+  movedFrom Category [not null]
+  movedTo Category [not null]
+  movedFromId Int [not null]
+  movedToId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Account {
+  id Int [pk, increment]
+  name String [not null]
+  startingBalance Float [not null]
+  transactions Transaction [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table Transaction {
+  id Int [pk, increment]
+  date DateTime [not null]
+  account Account [not null]
+  payee Payee [not null]
+  category Category [not null]
+  accountId Int [not null]
+  payeeId Int [not null]
+  categoryId Int [not null]
+  amount Float [not null]
+  cleared Boolean [not null]
+  reconciled Boolean [not null]
+  note String
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table OAuthClient {
+  id Int [pk, increment]
+  clientId String [unique, not null]
+  clientSecret String
+  redirectUris String [not null]
+  grants String [not null]
+  accessTokenLifetime Int
+  refreshTokenLifetime Int
+  accessTokens OAuthAccessToken [not null]
+  authorizationCodes OAuthAuthorizationCode [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table OAuthAuthorizationCode {
+  id Int [pk, increment]
+  authorizationCode String [not null]
+  expiresAt DateTime [not null]
+  redirectUri String [not null]
+  scope String [not null]
+  client OAuthClient [not null]
+  user User [not null]
+  clientId Int [not null]
+  userId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Table OAuthAccessToken {
+  id Int [pk, increment]
+  accessToken String [not null]
+  accessTokenExpiresAt DateTime
+  refreshToken String
+  refreshTokenExpiresAt DateTime
+  scope String [not null]
+  client OAuthClient [not null]
+  clientId Int [not null]
+  user User
+  userId Int
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
+Ref: Budget.userId > User.id
+
+Ref: Category.budgetId > Budget.id
+
+Ref: Category.groupId > CategoryGroup.id
+
+Ref: BudgetAction.movedFromId > Category.id
+
+Ref: BudgetAction.movedToId > Category.id
+
+Ref: Transaction.accountId > Account.id
+
+Ref: Transaction.payeeId > Payee.id
+
+Ref: Transaction.categoryId > Category.id
+
+Ref: OAuthAuthorizationCode.clientId > OAuthClient.id
+
+Ref: OAuthAuthorizationCode.userId > User.id
+
+Ref: OAuthAccessToken.clientId > OAuthClient.id
+
+Ref: OAuthAccessToken.userId > User.id

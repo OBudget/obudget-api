@@ -7,6 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
 model User {
   id                  Int        @id @default(autoincrement())
   name                String?
@@ -15,8 +19,88 @@ model User {
   salt                String
   accessTokens        OAuthAccessToken[]
   authorizationCodes  OAuthAuthorizationCode[]
+  budgets             Budget[]
   createdAt           DateTime   @default(now())
   updatedAt           DateTime   @updatedAt
+}
+
+model Payee {
+  id                  Int         @id @default(autoincrement())
+  name                String
+  transactions        Transaction[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Budget {
+  id                  Int         @id @default(autoincrement())
+  name                String
+  user                User        @relation(fields: [userId], references: [id])
+  userId              Int
+  categories          Category[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Category {
+  id                  Int            @id @default(autoincrement())
+  name                String
+  budget              Budget         @relation(fields: [budgetId], references: [id])
+  group               CategoryGroup? @relation(fields: [groupId], references: [id])
+  budgetId            Int
+  groupId             Int?
+  hidden              Boolean
+  transactions        Transaction[]
+  budgetTaken         BudgetAction[] @relation("from")
+  budgetAdded         BudgetAction[] @relation("to")
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model CategoryGroup {
+  id                  Int         @id @default(autoincrement())
+  name                String
+  categories          Category[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model BudgetAction {
+  id                  Int         @id @default(autoincrement())
+  date                DateTime    @db.Date
+  amount              Float
+  movedFrom           Category    @relation("from", fields: [movedFromId], references: [id])
+  movedTo             Category    @relation("to", fields: [movedToId], references: [id])
+  movedFromId         Int
+  movedToId           Int
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Account {
+  id                  Int         @id @default(autoincrement())
+  name                String
+  startingBalance     Float
+  transactions        Transaction[]
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
+model Transaction {
+  id                  Int        @id @default(autoincrement())
+  date                DateTime   @db.Date
+  account             Account    @relation(fields: [accountId], references: [id])
+  payee               Payee      @relation(fields: [payeeId], references: [id])
+  category            Category   @relation(fields: [categoryId], references: [id])
+  accountId           Int
+  payeeId             Int
+  categoryId          Int
+  amount              Float
+  cleared             Boolean
+  reconciled          Boolean
+  note                String?
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
 }
 
 model OAuthClient {
