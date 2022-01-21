@@ -42,6 +42,18 @@ model Budget {
   updatedAt           DateTime    @updatedAt
 }
 
+model BudgetAction {
+  id                  Int         @id @default(autoincrement())
+  date                DateTime
+  amount              Float
+  movedFrom           Category    @relation("from", fields: [movedFromId], references: [id])
+  movedTo             Category    @relation("to", fields: [movedToId], references: [id])
+  movedFromId         Int
+  movedToId           Int
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+}
+
 model Category {
   id                  Int            @id @default(autoincrement())
   name                String
@@ -65,42 +77,49 @@ model CategoryGroup {
   updatedAt           DateTime    @updatedAt
 }
 
-model BudgetAction {
-  id                  Int         @id @default(autoincrement())
-  date                DateTime    @db.Date
-  amount              Float
-  movedFrom           Category    @relation("from", fields: [movedFromId], references: [id])
-  movedTo             Category    @relation("to", fields: [movedToId], references: [id])
-  movedFromId         Int
-  movedToId           Int
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+enum AccountGroup {
+  BUDGET
+  TRACKING
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CASH
+  CREDIT
+  ASSET
+  LIABILITY
 }
 
 model Account {
-  id                  Int         @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   name                String
+  group               AccountGroup  @default(BUDGET)
+  type                AccountType   @default(CHECKING)
   startingBalance     Float
-  transactions        Transaction[]
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  transactions        Transaction[] @relation("transaction")
+  transfers           Transaction[] @relation("transfer")
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 }
 
 model Transaction {
   id                  Int        @id @default(autoincrement())
-  date                DateTime   @db.Date
-  account             Account    @relation(fields: [accountId], references: [id])
-  payee               Payee      @relation(fields: [payeeId], references: [id])
-  category            Category   @relation(fields: [categoryId], references: [id])
+  date                DateTime
+  account             Account    @relation("transaction", fields: [accountId], references: [id])
+  payee               Payee?     @relation(fields: [payeeId], references: [id])
+  category            Category?  @relation(fields: [categoryId], references: [id])
+  accountFrom         Account?   @relation("transfer", fields: [accountFromId], references: [id])
   accountId           Int
-  payeeId             Int
-  categoryId          Int
+  accountFromId       Int?
+  payeeId             Int?
+  categoryId          Int?
   amount              Float
   cleared             Boolean
   reconciled          Boolean
   note                String?
-  createdAt           DateTime    @default(now())
-  updatedAt           DateTime    @updatedAt
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 }
 
 model OAuthClient {

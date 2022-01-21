@@ -33,6 +33,18 @@ Table Budget {
   updatedAt DateTime [not null]
 }
 
+Table BudgetAction {
+  id Int [pk, increment]
+  date DateTime [not null]
+  amount Float [not null]
+  movedFrom Category [not null]
+  movedTo Category [not null]
+  movedFromId Int [not null]
+  movedToId Int [not null]
+  createdAt DateTime [default: `now()`, not null]
+  updatedAt DateTime [not null]
+}
+
 Table Category {
   id Int [pk, increment]
   name String [not null]
@@ -56,23 +68,14 @@ Table CategoryGroup {
   updatedAt DateTime [not null]
 }
 
-Table BudgetAction {
-  id Int [pk, increment]
-  date DateTime [not null]
-  amount Float [not null]
-  movedFrom Category [not null]
-  movedTo Category [not null]
-  movedFromId Int [not null]
-  movedToId Int [not null]
-  createdAt DateTime [default: `now()`, not null]
-  updatedAt DateTime [not null]
-}
-
 Table Account {
   id Int [pk, increment]
   name String [not null]
+  group AccountGroup [not null, default: 'BUDGET']
+  type AccountType [not null, default: 'CHECKING']
   startingBalance Float [not null]
   transactions Transaction [not null]
+  transfers Transaction [not null]
   createdAt DateTime [default: `now()`, not null]
   updatedAt DateTime [not null]
 }
@@ -81,11 +84,13 @@ Table Transaction {
   id Int [pk, increment]
   date DateTime [not null]
   account Account [not null]
-  payee Payee [not null]
-  category Category [not null]
+  payee Payee
+  category Category
+  accountFrom Account
   accountId Int [not null]
-  payeeId Int [not null]
-  categoryId Int [not null]
+  accountFromId Int
+  payeeId Int
+  categoryId Int
   amount Float [not null]
   cleared Boolean [not null]
   reconciled Boolean [not null]
@@ -137,21 +142,37 @@ Table OAuthAccessToken {
   updatedAt DateTime [not null]
 }
 
+Enum AccountGroup {
+  BUDGET
+  TRACKING
+}
+
+Enum AccountType {
+  CHECKING
+  SAVINGS
+  CASH
+  CREDIT
+  ASSET
+  LIABILITY
+}
+
 Ref: Budget.userId > User.id
-
-Ref: Category.budgetId > Budget.id
-
-Ref: Category.groupId > CategoryGroup.id
 
 Ref: BudgetAction.movedFromId > Category.id
 
 Ref: BudgetAction.movedToId > Category.id
+
+Ref: Category.budgetId > Budget.id
+
+Ref: Category.groupId > CategoryGroup.id
 
 Ref: Transaction.accountId > Account.id
 
 Ref: Transaction.payeeId > Payee.id
 
 Ref: Transaction.categoryId > Category.id
+
+Ref: Transaction.accountFromId > Account.id
 
 Ref: OAuthAuthorizationCode.clientId > OAuthClient.id
 
