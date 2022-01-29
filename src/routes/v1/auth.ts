@@ -51,7 +51,7 @@
 import express, { Request, Response } from "express";
 import OAuthServer from "express-oauth-server";
 
-import OAuthController from "controller/OAuthController";
+import OAuthController from "controller/OAuth";
 import OAuthModel from "model/OAuth";
 
 // Router for /auth/ endpoint
