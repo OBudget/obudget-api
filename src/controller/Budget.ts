@@ -41,7 +41,15 @@ const importBudget: RequestHandler = async (req: Request, res: Response) => {
       .json({ errors: Errors.BAD_REQUEST });
   }
 
-  console.log(req.files);
+  // "file" is the expected name of the uploaded file
+  // e.g. <input type="file" name="file" />
+  if (!req.files || !req.files.file) {
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ errors: Errors.BUDGET_IMPORT_MISSING_FILE });
+  }
+
+  console.log(req.files.file);
   // const { file } = req.files;
   // console.log(file);
 

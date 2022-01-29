@@ -6,11 +6,9 @@
  */
 
 import express from "express";
-import { body } from "express-validator";
 import fileUpload from "express-fileupload";
 
 import BudgetController from "controller/Budget";
-import Errors from "Errors";
 
 // Router for /budget/ api
 const router = express.Router();
@@ -23,15 +21,13 @@ router.use(
   "/import/:provider",
   fileUpload({
     limits: { fileSize: IMPORT_FILE_SIZE_BYTES },
+    abortOnLimit: true,
     useTempFiles: true,
     tempFileDir: "/tmp/",
+    safeFileNames: true,
   })
 );
 
-router.post(
-  "/import/:provider",
-  body("file").withMessage(Errors.BUDGET_IMPORT_MISSING_FILE),
-  BudgetController.importBudget
-);
+router.post("/import/:provider", BudgetController.importBudget);
 
 export default router;
