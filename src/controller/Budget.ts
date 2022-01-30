@@ -1,8 +1,14 @@
 import { NextFunction, Request, Response, RequestHandler } from "express";
 import { validationResult } from "express-validator";
+import { UploadedFile } from "express-fileupload";
 import { StatusCodes } from "http-status-codes";
 
 import Errors from "Errors";
+import logger from "logging";
+
+import { ValidationResponse } from "./utils";
+import importUtils from "./import";
+import BudgetImport from "./import/BudgetImport";
 
 const ALLOWED_IMPORT_PROVIDERS = ["ynab"];
 
@@ -49,11 +55,32 @@ const importBudget: RequestHandler = async (req: Request, res: Response) => {
       .json({ errors: Errors.BUDGET_IMPORT_MISSING_FILE });
   }
 
-  console.log(req.files.file);
-  // const { file } = req.files;
-  // console.log(file);
+  const { provider } = req.params;
 
-  return 0;
+  // Validate import file
+  const budgetImporter: BudgetImport = importUtils.getBudgetImportController(
+    provider,
+    req.files.file as UploadedFile
+  );
+  const fileValidation: ValidationResponse = await budgetImporter.validate();
+  if (fileValidation.error) {
+    return res
+      .status(fileValidation.status)
+      .json({ errors: fileValidation.error });
+  }
+
+  // Run import
+  try {
+    await budgetImporter.run();
+    logger.debug("YNAB import ran successfully!");
+    return res.status(StatusCodes.OK).send();
+  } catch (e) {
+    logger.debug("YNAB import failed.");
+    logger.debug(JSON.stringify(e, null, 2));
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .json({ errors: Errors.BUDGET_IMPORT_FAILED });
+  }
 };
 
 export default {
