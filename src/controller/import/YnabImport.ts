@@ -32,7 +32,7 @@ export default class YnabImport extends BudgetImport {
       logger.debug(JSON.stringify(this.file, null, 2));
 
       if (this.file.mimetype !== "application/zip") {
-        await this.cleanup();
+        this.cleanup();
 
         return {
           status: StatusCodes.BAD_REQUEST,
@@ -47,7 +47,7 @@ export default class YnabImport extends BudgetImport {
         return name.endsWith(".csv");
       });
       if (files.length !== 2 && allCsv) {
-        await this.cleanup();
+        this.cleanup();
         return {
           status: StatusCodes.BAD_REQUEST,
           error: Errors.BUDGET_IMPORT_YNAB_WRONG_CONTENT,
@@ -58,7 +58,7 @@ export default class YnabImport extends BudgetImport {
     } catch (e) {
       logger.debug("Caught an exception: ");
       logger.debug(JSON.stringify(e, null, 2));
-      await this.cleanup();
+      this.cleanup();
 
       return {
         status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -75,18 +75,18 @@ export default class YnabImport extends BudgetImport {
         await this.unzip(this.file.tempFilePath);
       }
 
-      await this.cleanup();
+      this.cleanup();
       return Promise.resolve();
     } catch (e) {
       logger.debug("Caught an exception: ");
       logger.debug(JSON.stringify(e, null, 2));
-      await this.cleanup();
+      this.cleanup();
       return Promise.reject();
     }
   };
 
-  async cleanup(): Promise<void> {
-    await super.cleanup();
+  cleanup(): void {
+    super.cleanup();
 
     // Delete the folder if the file has been unpacked
     if (fs.existsSync(this.unzippedFolder)) {

@@ -25,6 +25,7 @@ router.use(
     useTempFiles: true,
     tempFileDir: "/tmp/",
     safeFileNames: true,
+    debug: process.env.NODE_ENV === "development",
   })
 );
 

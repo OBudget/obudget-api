@@ -26,7 +26,7 @@ export default class BudgetImport {
     return Promise.reject();
   };
 
-  async cleanup(): Promise<void> {
+  cleanup(): void {
     // Delete the original file if exists
     if (fs.existsSync(this.file.tempFilePath)) {
       logger.debug(
